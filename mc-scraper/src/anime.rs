@@ -1,19 +1,19 @@
-struct Anime {
-    title: String,
-    synopsis: String,
-    status: String,
-    release_date: String,
-    kind: String,
-    genres: Vec<String>,
-    episodes: Vec<Episode>,
+pub struct Anime {
+    pub title: String,
+    pub synopsis: String,
+    pub status: String,
+    pub release_date: String,
+    pub kind: String,
+    pub genres: Vec<String>,
+    pub episodes: Vec<Episode>,
 }
 
-struct Episode {
-    name: String,
-    servers: Vec<Server>,
+pub struct Episode {
+    pub name: String,
+    pub servers: Vec<Server>,
 }
 
-struct Server {
-    name: String,
-    url: String,
+pub struct Server {
+    pub name: String,
+    pub url: String,
 }

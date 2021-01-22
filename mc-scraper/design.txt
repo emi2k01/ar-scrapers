@@ -1,0 +1,30 @@
+If db is empty:
+    Request all browse pages
+    Store checksum of every browse page
+    Request all animes
+    For every anime on air:
+        Store checksum of anime page
+        Store url of anime page
+        Store anime info
+        Store anime's episodes
+        Store episode's url
+Else:
+    Request all browse pages
+    For every browse page:
+        If browser page checksum changed:
+            Request animes in this browse page
+            If an anime is not stored:
+                Request anime info:
+                    Store anime info
+                    Store anime's episodes
+                    If anime is on air:
+                        Store checksum of anime page
+                        Store url of anime page
+
+Periodically:
+    For every anime on air stored:
+        If anime page checksum changed:
+            For every episode:
+                If there's a new episode url:
+                    Store episode
+                    Store episode url

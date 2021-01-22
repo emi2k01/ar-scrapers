@@ -7,8 +7,7 @@ edition = "2018"
 [dependencies]
 reqwest = "0.11.0"
 tokio = { version = "1.0.2", features = ["full"] }
-diesel = { version = "1.4.4", features = ["sqlite"] }
-scraper = "0.12.0"
+scrap = { version = "0.12.0", package = "scraper" }
 voca_rs = "1.13.0"
 dotenv = "0.15.0"
 log = "0.4.13"
@@ -17,3 +16,6 @@ url = "2.2.0"
 futures = "0.3.12"
 env_logger = "0.8.2"
 clap = "3.0.0-beta.2"
+adler = "1.0.1"
+once_cell = "1.5.2"
+sqlx = { git = "https://github.com/launchbadge/sqlx", default-features = false, features = ["macros", "runtime-tokio-rustls", "sqlite"] }
