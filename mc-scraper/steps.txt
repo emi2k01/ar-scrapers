@@ -1,0 +1,28 @@
+visit(https://monoschinos2.com/animes)
+
+for link in sel!(a.link-anime) {
+    visit(link.href)
+
+    anime.title = sel!(.Serie .Title).text
+    anime.synopsis = sel!(.Description).text
+    anime.status = sel!(.Type).text
+
+    let after_title = sel!(.after-title).text.split(" | ")
+
+    anime.release_date = after_title[0]
+    anime.kind = after_title[1]
+
+    for (i, genre) in sel!(.generos a) {
+        anime.genres[i] = genre.text
+    }
+
+    for (i, episode_link) in sel!(.SerieCaps a) {
+        visit(episode_link)
+        anime.episodes[i].name = sel!(.Title-epi).text
+
+        for ((j, server_frame), (k, server_li)) in sel!(.TPlayer .TPlayerTb iframe).zip(sel!(.TPlayerNv li)) {
+            anime.episodes[i].servers[i].url = server_frame.src.query("url")
+            anime.episodes[i].servers[i].name = server_li.data-original-title
+        }
+    }
+}
