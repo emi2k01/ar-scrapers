@@ -5,7 +5,6 @@ pub struct Anime {
     pub release_date: String,
     pub kind: String,
     pub genres: Vec<String>,
-    pub episodes: Vec<Episode>,
 }
 
 pub struct Episode {

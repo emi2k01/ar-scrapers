@@ -17,7 +17,7 @@ pub async fn scrape() -> anyhow::Result<()> {
     Ok(())
 }
 
-fn setup_client() -> Arc<Client> {
+fn setup_client() -> Client {
     let user_agent = dotenv::var("AR_USER_AGENT").unwrap_or(DEFAULT_USER_AGENT.to_string());
 
     let client = reqwest::ClientBuilder::new()
@@ -25,5 +25,5 @@ fn setup_client() -> Arc<Client> {
         .build()
         .unwrap();
 
-    Arc::new(client)
+    client
 }
