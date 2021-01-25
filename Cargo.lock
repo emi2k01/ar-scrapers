@@ -809,6 +809,7 @@ dependencies = [
  "futures",
  "log",
  "once_cell",
+ "percent-encoding",
  "reqwest",
  "scraper",
  "sqlx",
