@@ -46,7 +46,10 @@ pub async fn fetch_pages(urls: Vec<String>) -> Vec<(String, String)> {
                     None
                 }
             },
-            _ => None,
+            Err(e) => {
+                error!("{}", e);
+                None
+            }
         })
         .collect();
 
@@ -68,15 +71,19 @@ pub async fn fetch_browse_pages() -> Vec<(String, String)> {
 /// fetches all the urls in the attr attribute.
 ///
 /// Returns a `Vec` containing the url and the body of the request
-pub async fn fetch_pages_from_anchors(doc: &Html, anchors_selector: &str) -> Vec<(String, String)> {
-    let sel = Selector::parse(anchors_selector).unwrap();
-    let anchors = doc.select(&sel);
+pub async fn fetch_pages_from_anchors(body: &str, anchors_selector: &str) -> Vec<(String, String)> {
+    let urls = {
+        let doc = Html::parse_document(&body);
+        let sel = Selector::parse(anchors_selector).unwrap();
+        let anchors = doc.select(&sel);
 
-    let mut urls = Vec::with_capacity(30);
-    for anchor in anchors {
-        let href = anchor.value().attr("href").unwrap().to_string();
-        urls.push(href);
-    }
+        let mut urls = Vec::with_capacity(30);
+        for anchor in anchors {
+            let href = anchor.value().attr("href").unwrap().to_string();
+            urls.push(href);
+        }
+        urls
+    };
 
     fetch_pages(urls).await
 }

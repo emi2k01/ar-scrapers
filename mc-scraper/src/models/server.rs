@@ -3,6 +3,7 @@ use percent_encoding::percent_decode_str;
 use scrap::{Html, Selector};
 
 pub struct Server {
+    pub episode_id: i64,
     pub name: String,
     pub url: String,
 }
@@ -23,7 +24,7 @@ impl Server {
         for (option, iframe) in options_iframes {
             let server_name = option
                 .value()
-                .attr("data-original-title")
+                .attr("title")
                 .unwrap()
                 .to_string();
 
@@ -38,6 +39,7 @@ impl Server {
                     let url = percent_decode_str(&url).decode_utf8()?.to_string();
 
                     let server = Server {
+                        episode_id: 0,
                         name: server_name,
                         url,
                     };
