@@ -6,11 +6,10 @@ extern crate anyhow;
 
 use anyhow::Result;
 use fetchers::fetch_pages_from_anchors;
-use futures::{stream, FutureExt, StreamExt};
+use futures::{stream, StreamExt};
 use models::{Anime, AnimeUrl, Episode, EpisodeUrl, PageChecksum};
 use scrap::{Html, Selector};
 use sqlx::SqlitePool;
-use tokio::spawn;
 
 mod db;
 mod fetchers;

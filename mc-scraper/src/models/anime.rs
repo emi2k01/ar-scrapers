@@ -134,6 +134,7 @@ impl Anime {
         Ok(())
     }
 
+    #[allow(unused)]
     pub async fn select_by_url(url: &str) -> Result<Self, sqlx::Error> {
         let anime_url = AnimeUrl::select_by_url(url).await?;
         let anime_dyn = sqlx::query!("SELECT * FROM animes WHERE id = ?", anime_url.id)
