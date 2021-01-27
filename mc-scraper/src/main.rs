@@ -54,8 +54,6 @@ async fn scrape_anime(anime_url: String, anime_body: String) -> Result<()> {
     if anime_page_checksum.is_new() {
         debug!("page {} is new", anime_url);
 
-        anime_page_checksum.insert().await?;
-
         let mut anime = {
             let anime_doc = Html::parse_document(&anime_body);
             Anime::extract(&anime_doc)?
@@ -79,10 +77,10 @@ async fn scrape_anime(anime_url: String, anime_body: String) -> Result<()> {
             let mut episode_url = EpisodeUrl::new(episode_url, episode.id);
             episode_url.insert().await?;
         }
+
+        anime_page_checksum.insert().await?;
     } else if anime_page_checksum.changed() {
         debug!("page {} changed", anime_url);
-
-        anime_page_checksum.update().await?;
 
         let episodes_urls_iter = {
             let anime_doc = Html::parse_document(&anime_body);
@@ -119,6 +117,8 @@ async fn scrape_anime(anime_url: String, anime_body: String) -> Result<()> {
             let mut episode_url = EpisodeUrl::new(episode_url, episode.id);
             episode_url.insert().await?;
         }
+
+        anime_page_checksum.update().await?;
     } else {
         debug!("page {} didn't change", anime_url);
     }

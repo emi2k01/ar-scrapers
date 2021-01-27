@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use futures::{stream, StreamExt};
+use once_cell::sync::Lazy;
 use reqwest::Client;
 use scrap::{Html, Selector};
 
@@ -89,14 +90,15 @@ pub async fn fetch_pages_from_anchors(body: &str, anchors_selector: &str) -> Vec
 }
 
 fn setup_client() -> Client {
-    let user_agent = dotenv::var("AR_USER_AGENT").unwrap_or(DEFAULT_USER_AGENT.to_string());
+    static CLIENT: Lazy<Client> = once_cell::sync::Lazy::new(|| {
+        let user_agent = dotenv::var("AR_USER_AGENT").unwrap_or(DEFAULT_USER_AGENT.to_string());
+        reqwest::ClientBuilder::new()
+            .user_agent(&user_agent)
+            .build()
+            .unwrap()
+    });
 
-    let client = reqwest::ClientBuilder::new()
-        .user_agent(&user_agent)
-        .build()
-        .unwrap();
-
-    client
+    CLIENT.clone()
 }
 
 fn build_browse_urls(num_pages: u32) -> Vec<String> {

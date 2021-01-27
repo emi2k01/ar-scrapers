@@ -26,7 +26,12 @@ impl Episode {
             .unwrap()
             .to_string();
 
-        let servers = Server::extract_many(doc)?;
+        let body = doc.root_element().html().replace("&lt;", "<");
+        let body = body.replace("&gt;", ">");
+        let body = body.replace("&quot;", "\"");
+        let doc = Html::parse_document(&body);
+
+        let servers = Server::extract_many(&doc)?;
 
         Ok(Self {
             id: 0,
@@ -39,12 +44,14 @@ impl Episode {
     pub async fn insert(&mut self) -> Result<(), sqlx::Error> {
         debug!("inserting episode {}", self.title);
 
+        let mut transaction = DB.get().unwrap().begin().await.unwrap();
+
         let id = sqlx::query!(
             "INSERT INTO episodes (anime_id, title) VALUES (?, ?)",
             self.anime_id,
             self.title
         )
-        .execute(DB.get().unwrap())
+        .execute(&mut transaction)
         .await?
         .last_insert_rowid();
 
@@ -57,9 +64,11 @@ impl Episode {
                 server.name,
                 server.url
             )
-            .execute(DB.get().unwrap())
+            .execute(&mut transaction)
             .await?;
         }
+
+        transaction.commit().await.unwrap();
 
         Ok(())
     }

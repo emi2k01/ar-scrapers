@@ -92,6 +92,8 @@ impl Anime {
     }
 
     pub async fn insert(&mut self) -> Result<(), sqlx::Error> {
+        let mut transaction = DB.get().unwrap().begin().await.unwrap();
+
         let id = sqlx::query!(
             "INSERT INTO animes (title, synopsis, status, release_date, kind) VALUES (?, ?, ?, ?, ?)",
             self.title,
@@ -99,7 +101,7 @@ impl Anime {
             self.status,
             self.release_date,
             self.kind,
-        ).execute(DB.get().unwrap())
+        ).execute(&mut transaction)
         .await?
         .last_insert_rowid();
 
@@ -107,13 +109,13 @@ impl Anime {
 
         for genre in &self.genres {
             let genre_id_res = sqlx::query!("SELECT id FROM genres WHERE genre = ?", genre)
-                .fetch_optional(DB.get().unwrap())
+                .fetch_optional(&mut transaction)
                 .await?;
 
             let genre_id = match genre_id_res {
                 Some(record) => record.id,
                 None => sqlx::query!("INSERT INTO genres (genre) VALUES (?)", genre)
-                    .execute(DB.get().unwrap())
+                    .execute(&mut transaction)
                     .await?
                     .last_insert_rowid(),
             };
@@ -123,9 +125,11 @@ impl Anime {
                 id,
                 genre_id,
             )
-            .execute(DB.get().unwrap())
+            .execute(&mut transaction)
             .await?;
         }
+
+        transaction.commit().await.unwrap();
 
         Ok(())
     }
@@ -136,20 +140,15 @@ impl Anime {
             .fetch_one(DB.get().unwrap())
             .await?;
 
-        let genres_ids = sqlx::query!(
-            "SELECT (genre_id) FROM animes_genres WHERE anime_id = ?",
+        let genres = sqlx::query!(
+            "SELECT genres.genre genre FROM genres INNER JOIN animes_genres ON animes_genres.genre_id = genres.id WHERE animes_genres.anime_id = ?",
             anime_dyn.id,
         )
         .fetch_all(DB.get().unwrap())
-        .await?;
-
-        let mut genres = Vec::with_capacity(5);
-        for genre_id in genres_ids {
-            let genre = sqlx::query!("SELECT (genre) FROM genres WHERE id = ?", genre_id.genre_id)
-                .fetch_one(DB.get().unwrap())
-                .await?;
-            genres.push(genre.genre);
-        }
+        .await?
+        .into_iter()
+        .map(|record| record.genre)
+        .collect::<Vec<String>>();
 
         Ok(Anime {
             id: anime_dyn.id,
