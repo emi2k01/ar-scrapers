@@ -19,4 +19,4 @@ env_logger = "0.8.2"
 clap = "3.0.0-beta.2"
 adler = "1.0.1"
 once_cell = "1.5.2"
-sqlx = { git = "https://github.com/launchbadge/sqlx", default-features = false, features = ["macros", "runtime-tokio-rustls", "sqlite"] }
+sqlx = { git = "https://github.com/launchbadge/sqlx", features = ["runtime-tokio-rustls", "sqlite"] }

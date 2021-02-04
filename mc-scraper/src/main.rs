@@ -5,27 +5,37 @@ extern crate log;
 extern crate anyhow;
 
 use anyhow::Result;
-use fetchers::fetch_pages_from_anchors;
-use futures::{stream, StreamExt};
-use models::{Anime, AnimeUrl, Episode, EpisodeUrl, PageChecksum};
-use scrap::{Html, Selector};
+use clap::Clap;
+use opts::{Opts, SubCmd};
 use sqlx::SqlitePool;
 
 mod db;
 mod fetchers;
 mod models;
 mod scraper;
+mod opts;
 
 #[tokio::main]
 async fn main() -> Result<()> {
     env_logger::Builder::from_env("LOG").init();
+
+    let opts = Opts::parse();
 
     let database_url = dotenv::var("DATABASE_URL")?;
     db::DB
         .set(SqlitePool::connect(&database_url).await?)
         .unwrap();
 
-    scrape().await?;
+    sqlx::migrate!("./migrations")
+        .run(db::DB.get().unwrap())
+        .await?;
+
+    match opts.subcmd {
+        SubCmd::Scrape => scraper::scrape().await?,
+        SubCmd::Render(opts) => {
+            
+        }
+    }
 
     Ok(())
 }

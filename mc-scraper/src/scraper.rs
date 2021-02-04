@@ -8,7 +8,7 @@ use crate::{
     models::{Anime, AnimeUrl, Episode, EpisodeUrl, PageChecksum},
 };
 
-async fn scrape() -> Result<()> {
+pub async fn scrape() -> Result<()> {
     let browse_pages = fetch_browse_pages().await;
 
     for (_browse_url, browse_body) in browse_pages {
